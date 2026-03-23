@@ -2,49 +2,66 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "todo-app"
-        CONTAINER_NAME = "todo-app-container"
+        // You can define environment variables here
+        APP_NAME = "todo-app"
+        DOCKER_IMAGE = "todo-app:latest"
     }
 
     stages {
 
-        stage('Clone Repo') {
+        stage('Checkout SCM') {
             steps {
-                git 'https://github.com/Vickymishra152/todo-app.git'
+                // Checkout the branch that triggered the build
+                git branch: "${env.BRANCH_NAME}", url: 'https://github.com/Vickymishra152/todo-app.git'
             }
         }
 
         stage('Build App') {
             steps {
-                sh 'npm install'
+                echo "Building ${env.APP_NAME}..."
+                // Example: for Node.js
+                sh '''
+                    cd todo-app
+                    npm install
+                    npm run build
+                '''
             }
         }
 
         stage('Test App') {
             steps {
-                sh 'npm test || echo "No tests found"'
+                echo "Running tests..."
+                sh '''
+                    cd todo-app
+                    npm test
+                '''
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME .'
+                echo "Building Docker image ${env.DOCKER_IMAGE}..."
+                sh '''
+                    docker build -t ${DOCKER_IMAGE} todo-app/
+                '''
             }
         }
 
         stage('Stop Old Container') {
             steps {
+                echo "Stopping old container if it exists..."
                 sh '''
-                docker stop $CONTAINER_NAME || true
-                docker rm $CONTAINER_NAME || true
+                    docker stop ${APP_NAME} || true
+                    docker rm ${APP_NAME} || true
                 '''
             }
         }
 
         stage('Run Container') {
             steps {
+                echo "Running new container..."
                 sh '''
-                docker run -d -p 3000:3000 --name $CONTAINER_NAME $IMAGE_NAME
+                    docker run -d --name ${APP_NAME} -p 3000:3000 ${DOCKER_IMAGE}
                 '''
             }
         }
@@ -52,10 +69,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Deployment successful!'
+            echo "✅ Build and deploy successful!"
         }
         failure {
-            echo '❌ Build failed!'
+            echo "❌ Build failed!"
         }
     }
 }
