@@ -21,7 +21,7 @@ pipeline {
                 echo "Building ${env.APP_NAME}..."
                 // Example: for Node.js
                 sh '''
-                    cd todo-app
+                //    cd todo-app
                     npm install
                     npm run build
                 '''
