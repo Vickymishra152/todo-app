@@ -9,12 +9,12 @@ pipeline {
 
     stages {
 
-#        stage('Checkout SCM') {
-#            steps {
-#                // Checkout the branch that triggered the build
-#                git branch: "${env.BRANCH_NAME}", url: 'https://github.com/Vickymishra152/todo-app.git'
-#           }
-#        }
+//        stage('Checkout SCM') {
+//            steps {
+//                // Checkout the branch that triggered the build
+//                git branch: "${env.BRANCH_NAME}", url: 'https://github.com/Vickymishra152/todo-app.git'
+//    }
+//        }
 
         stage('Build App') {
             steps {
